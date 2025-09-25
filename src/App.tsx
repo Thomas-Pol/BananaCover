@@ -226,7 +226,7 @@ function App() {
                     <div className="w-12 h-12 rounded-lg bg-white grid place-items-center shadow">🍌</div>
                     <span className="text-4xl font-bold">{result.bananas}</span>
                   </div>
-                  <p className="mt-4 text-xl text-[#6B3A00]">Your {result.objectName} has been banana-fied!</p>
+                  <p className="mt-4 text-xl text-[#6B3A00]">Your object has been banana-fied!</p>
                   <p className="mt-1 text-3xl md:text-4xl font-bold text-[#6B3A00]">Made of {result.bananas} bananas 🍌</p>
                   
                 </div>
