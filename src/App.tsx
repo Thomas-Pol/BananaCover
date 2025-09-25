@@ -255,7 +255,7 @@ function App() {
         {/* Footer */}
         <div className="w-full max-w-5xl text-center text-[#6B3A00] mt-12 mb-10">
           <p className="text-sm">Made with 🍌 and ❤️</p>
-          <p className="text-xs text-gray-600 mt-2">Disclaimer: Results are simulated for entertainment purposes. For actual measurements, please use a real ruler!</p>
+          <p className="text-xs text-gray-600 mt-2">Disclaimer: Results are simulated for entertainment purposes.</p>
         </div>
       </div>
     </div>
