@@ -27,6 +27,7 @@
   font-style: normal;
 }
 
+/* Use a neutral, readable sans-serif font across the app to match the mockups */
 body {
-  font-family: 'BananaGroovy', sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
 }
