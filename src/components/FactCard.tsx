@@ -1,5 +1,3 @@
-import React from 'react';
-
 export function FactCard({ label, text }: { label: string; text: string }) {
   return (
     <div className="bg-white rounded-xl shadow p-5">
