@@ -16,7 +16,7 @@ function App() {
   const [uiState, setUiState] = useState<AnalysisState>('idle');
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
-  const [progressLabel, setProgressLabel] = useState('Detecting objects...');
+  const [progressLabel, setProgressLabel] = useState('Detecting object...');
   const [result, setResult] = useState<{
     objectName: string;
     bananas: number;
@@ -26,16 +26,18 @@ function App() {
   const [model, setModel] = useState<any | null>(null);
   const bananaSpriteRef = useRef<HTMLImageElement | null>(null);
 
-  // Load the detection model once & preload banana sprite
+  // Load detection model & preload banana sprite
   useEffect(() => {
     let mounted = true;
     (async () => {
       try {
         setProgressLabel('Loading model...');
-        const loaded = await loadModel();
-        if (mounted) setModel(loaded);
+        const m = await loadModel();
+        if (mounted) setModel(m);
+        if (mounted) setProgressLabel('Ready');
       } catch (e) {
         console.error('Model load failed', e);
+        if (mounted) setProgressLabel('Model load failed – fallback mode');
       }
     })();
     const sprite = new Image();
@@ -88,22 +90,26 @@ function App() {
   };
 
   const runAnalysis = async (imgEl: HTMLImageElement) => {
-    if (!model) setProgressLabel('Loading model...');
     setUiState('analyzing');
     setProgress(10);
-    setProgressLabel('Detecting object...');
+    setProgressLabel('Detecting objects...');
     try {
+      let activeModel = model;
+      if (!activeModel) {
+        activeModel = await loadModel();
+        setModel(activeModel);
+      }
       const workingCanvas = canvasRef.current;
-      const detections = await model?.detect(workingCanvas ?? imgEl, 20, 0.5);
+      const detections = await activeModel.detect(workingCanvas ?? imgEl, 20, 0.5);
       setProgress(55);
       setProgressLabel('Selecting main object...');
       const banana = detections?.find((d: any) => d.class === 'banana');
       const others = detections?.filter((d: any) => d.class !== 'banana') ?? [];
       const subject = others.sort((a: any, b: any) => boxArea(b.bbox) - boxArea(a.bbox))[0];
       setProgress(80);
-      setProgressLabel('Banana-fying object...');
-      const objectName = subject?.class ?? banana?.class ?? 'Object';
-      const confidence = subject?.score ?? banana?.score ?? 0.9;
+      setProgressLabel('Covering object with bananas...');
+      const objectName = subject?.class ?? banana?.class ?? 'object';
+      const confidence = subject?.score ?? banana?.score ?? 0.85;
       const targetBox = subject?.bbox || banana?.bbox || centralFallbackBox(canvasRef.current);
       const bananasUsed = bananafyBox(targetBox as [number, number, number, number], canvasRef.current, bananaSpriteRef.current);
       const exportCanvas = canvasRef.current;
@@ -111,18 +117,20 @@ function App() {
         try { setUploadedUrl(exportCanvas.toDataURL('image/png')); } catch {}
       }
       setProgress(100);
-      setProgressLabel('Finishing up...');
+      setProgressLabel('Done');
       setResult({ objectName: prettyLabel(objectName), bananas: bananasUsed, confidence });
       setFacts(pickRandomFacts(6));
       setUiState('done');
     } catch (e) {
       console.error('Detection failed', e);
-      const fallback = bananafyBox(centralFallbackBox(canvasRef.current), canvasRef.current, bananaSpriteRef.current);
+      const fallbackBananas = bananafyBox(centralFallbackBox(canvasRef.current), canvasRef.current, bananaSpriteRef.current);
       const exportCanvas = canvasRef.current;
       if (exportCanvas) {
         try { setUploadedUrl(exportCanvas.toDataURL('image/png')); } catch {}
       }
-      setResult({ objectName: 'Object', bananas: fallback, confidence: 0.9 });
+      setProgress(100);
+      setProgressLabel('Fallback complete');
+      setResult({ objectName: 'Object', bananas: fallbackBananas, confidence: 0.8 });
       setFacts(pickRandomFacts(6));
       setUiState('done');
     }
@@ -220,9 +228,7 @@ function App() {
                   </div>
                   <p className="mt-4 text-xl text-[#6B3A00]">Your {result.objectName} has been banana-fied!</p>
                   <p className="mt-1 text-3xl md:text-4xl font-bold text-[#6B3A00]">Made of {result.bananas} bananas 🍌</p>
-                  <div className="inline-block mt-4 text-xs bg-[#E8EEFF] text-[#1F3A93] px-3 py-1 rounded-full shadow-sm">
-                    {Math.round(result.confidence * 100)}% confidence
-                  </div>
+                  
                 </div>
               </div>
 
