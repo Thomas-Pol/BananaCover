@@ -245,7 +245,6 @@ function App() {
                 <div className="mt-8 bg-[#FFF6BF] border border-[#FFE082] text-[#6B3A00] rounded-xl p-6 text-center">
                   <h4 className="font-semibold text-lg">🎯 Banana Cover Challenge!</h4>
                   <p className="mt-2">Try covering different objects around your house with bananas, And see what object fits the most bananas!</p>
-                  <p className="mt-2 text-sm">Remember: The average banana is 18cm long</p>
                 </div>
               </div>
             </div>
